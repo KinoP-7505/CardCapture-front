@@ -1,0 +1,20 @@
+.board {
+  width: 1200px;
+  margin: 20px auto;
+  font-family: sans-serif;
+}
+
+.top,
+.middle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.message {
+  height: 140px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 30px;
+}

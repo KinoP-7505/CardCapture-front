@@ -1,0 +1,17 @@
+.card {
+  width: 120px;
+  height: 160px;
+  border: 2px solid #8b5a00;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 敵カード */
+.card.enemy {
+  background-color: #fff2be;
+}
+
+/* プレイヤーカード */
+.card.player {
+  background-color: #c9f2f3;
+}
