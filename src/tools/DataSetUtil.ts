@@ -1,4 +1,4 @@
-import type { CardCaptureResponse } from "@/Types/CardCaptureResponse"
+import type { CardCaptureResponse } from "@/Types/CardCaptureDto"
 import type { GameCard } from "@/Types/AppTypes"
 
 /**

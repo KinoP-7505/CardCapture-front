@@ -2,7 +2,7 @@ import { useAxiosStore } from "@/tools/AxiosManager"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import { dataToInfo } from "@/tools/DataSetUtil"
-import type { CardCaptureResponse } from "@/Types/CardCaptureResponse"
+import type { CardCaptureResponse } from "@/Types/CardCaptureDto"
 import { Button } from "@chakra-ui/react"
 import useSWRMutation from "swr/mutation"
 

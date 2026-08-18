@@ -15,6 +15,8 @@ type BattleInfoState = {
   setPlayerHands: (cards: GameCard[]) => void
   processState: number // 処理状態
   setProcessState: (pState: number) => void
+  actionState: number // アクション状態
+  setActionState: (aState: number) => void
 
   cardSelected: boolean // カード選択中
   setCardSelected: (selected: boolean) => void // カード選択中
@@ -24,6 +26,7 @@ type BattleInfoState = {
   toggleEnemyCardSelected: (index: number) => void
   selectedPlayerCard: number[] // 選択中手札カード
   setSelectedPlayerCard: (cardCodes: number[]) => void // 選択中手札カード
+  toggleHandsSingleSelected: (index: number) => void // 選択状態１枚変更
   toggleHandsSelected: (index: number) => void // 選択状態変更
   resetSelected: () => void // 選択状態をリセット
   sumSelectedHands: number // 選択中カード数字合計
@@ -54,6 +57,9 @@ export const useBattleInfoStore = create<BattleInfoState>()(
       setPlayerHands: (cards) => set({ playerHands: cards }),
       processState: 0,
       setProcessState: (pState) => set({ processState: pState }),
+
+      actionState: 0, // アクション状態
+      setActionState: (aState) => set({ actionState: aState }),
 
       cardSelected: false, // カード選択中
       setCardSelected: (selected) => set({ cardSelected: selected }), // カード選択中
@@ -110,7 +116,23 @@ export const useBattleInfoStore = create<BattleInfoState>()(
             enemyArea: updatedEnemyArea, // ⭕ boolean ではなく配列を渡す
           }
         }),
+
       setSelectedPlayerCard: (cardCodes: number[]) => set({ selectedPlayerCard: cardCodes }), // 選択中手札カード
+      // 選択状態１枚変更
+      toggleHandsSingleSelected: (index: number) =>
+        set((state) => {
+          // 対象カードが未選択の場合は、選択中を解除して、indexを選択中
+          const newHands = state.playerHands.map((item, idx) => {
+            return {
+              ...item, // itemをコピーした配列を新規作成
+              selected: index === idx, // インデックスと一致するカードを選択中にする
+            }
+          })
+          return {
+            playerHands: newHands,
+          }
+        }),
+      // 選択状態複数変更
       toggleHandsSelected: (index) =>
         set((state) => {
           // 1. .map で該当要素の selected だけを反転させた新しい配列を生成する

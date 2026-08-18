@@ -7,9 +7,10 @@ export const EnemyArea: React.FC = () => {
   const cardTiitle = "Enemy\nCard"
 
   // const axiossStore = useAxiosStore()
-  const batteleInfo = useBattleInfoStore()
-  const enemyArea = batteleInfo.enemyArea
-  const canSelected = batteleInfo.cardSelected
+  const info = useBattleInfoStore()
+  const enemyArea = info.enemyArea
+  const canSelected = info.cardSelected
+  const act = info.actionState
 
   return (
     <Box h="220px" bg="#C95C0C" p={4}>
@@ -27,11 +28,12 @@ export const EnemyArea: React.FC = () => {
               suit={card.suit}
               num={card.number}
               bg="#ffeacf"
+              topLabel={index === 0 ? "TOP CARD" : ""}
               selected={card.selected}
               onClick={() => {
-                if (canSelected) {
-                  // 選択中更新
-                  batteleInfo.toggleCaptureEnemySelected(index)
+                if (canSelected && act === 1) {
+                  // 選択中、かつ、捕獲アクションの場合
+                  info.toggleCaptureEnemySelected(index)
                 }
               }}
             />

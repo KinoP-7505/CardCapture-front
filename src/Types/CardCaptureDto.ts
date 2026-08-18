@@ -1,4 +1,8 @@
-import type { GameDeck } from "./GameDeck"
+import type { GameCard, GameDeck } from "./AppTypes"
+
+export type InitAppResponse = {
+  trumpDeck: Map<number, GameCard> // トランプカードマップ
+}
 
 export type CardCaptureResponse = {
   enemyArea: GameDeck // エネミーエリア
@@ -9,4 +13,10 @@ export type CardCaptureResponse = {
   playerDeckSize: number // プレイヤーデッキサイズ
   discardSize: number // 捨て札デッキサイズ
   processState: number // 処理状態
+}
+
+export type CardCaptureRequest = {
+  actionCode: number // 実行アクション 1.捕獲 2.封印 3.吹き飛ばし
+  targetEnemy: number // 対象EnemyCardコード
+  selected: number[] // 選択HandsCardコード
 }

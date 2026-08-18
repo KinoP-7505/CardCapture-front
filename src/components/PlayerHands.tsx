@@ -9,26 +9,38 @@ export const PlayerHands = () => {
   const info = useBattleInfoStore()
   const playerHands = info.playerHands
   const canSelected = info.cardSelected
+  const act = info.actionState
 
   const toggleSelected = (index: number) => {
     const enemySuit = Math.trunc(info.selectedEnemyCard / 100)
     const pSuit = playerHands[index].suit
-    // １．選択状態である、かつ、
-    // ２．敵カードが選択中である、かつ、
-    // ３．クリックしたカードが選択中敵カードのスートと一致する
-    //     ジョーカーの場合、選択中カードが１枚以上
-    if (canSelected && info.selectedEnemyCard > 0) {
-      console.log(
-        `info.selectedEnemyCard  : ${info.selectedEnemyCard}` +
-          `enemySuit : ${enemySuit}` +
-          `pSuit : ${pSuit}`,
-      )
-      // ジョーカー選択判定
-      const isSelectedJoker = pSuit === 5 && info.selectedPlayerCard.length > 0
-      // 選択判定判定
-      if (enemySuit === pSuit || isSelectedJoker) {
-        // スート選択
-        info.toggleHandsSelected(index)
+
+    // act 1：捕獲アクション
+    // act 2：封印アクション
+    if (act === 1) {
+      // １．選択状態である、かつ、
+      // ２．敵カードが選択中である、かつ、
+      // ３．クリックしたカードが選択中敵カードのスートと一致する、かつ、数字であること
+      //     ジョーカーの場合、選択中カードが１枚以上
+      if (canSelected && info.selectedEnemyCard > 0) {
+        console.log(
+          `info.selectedEnemyCard  : ${info.selectedEnemyCard}` +
+            `enemySuit : ${enemySuit}` +
+            `pSuit : ${pSuit}`,
+        )
+        // ジョーカー選択判定
+        const isSelectedJoker = pSuit === 5 && info.selectedPlayerCard.length > 0
+        // 選択判定判定
+        if (enemySuit === pSuit || isSelectedJoker) {
+          // スート選択
+          info.toggleHandsSelected(index)
+        }
+      }
+    } else if (act === 2) {
+      // 封印アクション
+      // 対象が未選択のとき
+      if (canSelected && info.selectedEnemyCard > 0 && !info.playerHands[index].selected) {
+        info.toggleHandsSingleSelected(index)
       }
     }
   }
@@ -50,9 +62,13 @@ export const PlayerHands = () => {
               suit={card.suit}
               num={card.number}
               bg="#CFF8FF"
+              topLabel=" "
               selected={card.selected}
               onClick={() => {
-                toggleSelected(index)
+                // 数札の場合、選択可能
+                if (card.numberCard) {
+                  toggleSelected(index)
+                }
               }}
             />
           )

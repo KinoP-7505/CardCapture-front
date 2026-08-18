@@ -1,4 +1,4 @@
-import { useAxiosStore } from "@/tools/AxiosManager"
+import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import { Box, Stack, Text } from "@chakra-ui/react"
 
 /**
@@ -6,8 +6,9 @@ import { Box, Stack, Text } from "@chakra-ui/react"
  * @returns ゲーム情報
  */
 export const BattleInfo: React.FC = () => {
-  const battleInfo = useAxiosStore((state) => state.battleInfo)
+  // const battleInfo = useAxiosStore((state) => state.battleInfo)
 
+  const battleInfo = useBattleInfoStore().battleInfo
   const rounds = battleInfo.rounds === 0 ? "開始前" : battleInfo.rounds
 
   return (

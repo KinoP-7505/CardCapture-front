@@ -8,12 +8,22 @@ type CardItemProps = {
   suit: number
   num: number
   bg: string
+  topLabel: string
   selected: boolean
   onClick?: () => void // クリックイベント
 }
 
-export const CardItem: React.FC<CardItemProps> = ({ title, suit, num, bg, selected, onClick }) => {
+export const CardItem: React.FC<CardItemProps> = ({
+  title,
+  suit,
+  num,
+  bg,
+  topLabel,
+  selected,
+  onClick,
+}) => {
   const selectText = selected ? "選択中" : ""
+  const tLabel = topLabel.length > 0 ? topLabel : "-----"
 
   // スートアイコンの設定
   const suit_icon = (suit: number) => {
@@ -62,7 +72,7 @@ export const CardItem: React.FC<CardItemProps> = ({ title, suit, num, bg, select
       h="140px"
       bg={bg}
       border="3px solid #8b5a00"
-      p={3}
+      p={1}
       boxShadow="md"
       onClick={onClick}
     >
@@ -76,11 +86,14 @@ export const CardItem: React.FC<CardItemProps> = ({ title, suit, num, bg, select
       >
         {title}
       </Text>
-      <HStack gap={1} align={"center"} justify="center" mt={2}>
+      <HStack gap={0} align={"center"} justify="center" mt={1}>
         {suit_icon(suit)}
         <Text fontSize="28px">{num}</Text>
       </HStack>
-      <Text mt={3} fontWeight="bold">
+      <Text mt={1} fontSize="12px" fontWeight="bold">
+        {tLabel}
+      </Text>
+      <Text mt={1} fontWeight="bold">
         {selectText}
       </Text>
     </Box>

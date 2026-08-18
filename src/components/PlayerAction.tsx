@@ -3,7 +3,7 @@ import { Box, Button, Stack } from "@chakra-ui/react"
 import { PlayerActionSelect } from "./PlayerActionSelect"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import { dataToInfo } from "@/tools/DataSetUtil"
-import type { CardCaptureResponse } from "@/Types/CardCaptureResponse"
+import type { CardCaptureResponse } from "@/Types/CardCaptureDto"
 import useSWRMutation from "swr/mutation"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
 
@@ -25,8 +25,6 @@ export const PlayerAction: React.FC = () => {
     infoStore.setPlayerHands(toInfo.playerHandCards)
     infoStore.setBattleInfo(toInfo.battleInfo)
     infoStore.setProcessState(toInfo.processState)
-
-    console.log("battleInfo:", axiosStore.battleInfo)
 
     axiosStore.addMessage("ゲーム開始：盤面作成")
   }

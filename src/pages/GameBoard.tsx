@@ -2,18 +2,19 @@ import { Box, Grid, GridItem } from "@chakra-ui/react"
 import "./GameBoard.css"
 import { useAxiosStore } from "@/tools/AxiosManager"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
-import type { InitAppResponse } from "@/Types/InitAppResponse"
 import useSWR from "swr"
 import { EnemyArea } from "@/components/EnemyArea"
 import { BattleInfo } from "@/components/BattleInfo"
 import { PlayerHands } from "@/components/PlayerHands"
 import { PlayerAction } from "@/components/PlayerAction"
 import { MessageInfo } from "@/components/MessageInfo"
+import { useBattleInfoStore } from "@/tools/BattleInfoManager"
+import type { InitAppResponse } from "@/Types/CardCaptureDto"
 
 const GameBoard = () => {
   // const axiosStore = useAxiosStore();
-  const trumpDeck = useAxiosStore((state) => state.trumpDeck)
-  const setTrumpDeck = useAxiosStore((state) => state.setTrumpDeck)
+  const info = useBattleInfoStore()
+  const trumpDeck = info.trumpDeck
   const addMessage = useAxiosStore((state) => state.addMessage)
 
   const shouldFetch = trumpDeck.size === 0
@@ -22,7 +23,7 @@ const GameBoard = () => {
   useSWR<InitAppResponse>(shouldFetch ? END_POINT.get_initApp : null, fetcher, {
     onSuccess: (data) => {
       console.log("GET通信成功:", data)
-      setTrumpDeck(data.trumpDeck)
+      info.setTrumpDeck(data.trumpDeck)
       addMessage("トランプカードを受信しました。")
     },
   })
