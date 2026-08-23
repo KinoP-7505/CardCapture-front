@@ -6,6 +6,7 @@ const url = "/api/cardcapture"
 export const END_POINT = {
   get_initApp: url + "/initApp", // ゲーム初期化、定数受信
   get_startRound: url + "/startRound", // ゲーム開始
+  get_setUp: url + "/setUp", // ゲーム開始
   actionCheck: url + "/actionCheck", // アクションチェック
   post_executeAction: url + "/executeAction", // アクション実行
 }

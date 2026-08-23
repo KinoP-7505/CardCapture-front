@@ -1,5 +1,5 @@
 import type { CardCaptureResponse } from "@/Types/CardCaptureDto"
-import type { GameCard } from "@/Types/AppTypes"
+import type { GameCard, GameDeck } from "@/Types/AppTypes"
 
 /**
  * レスポンスをBattleInfo型に変換する
@@ -7,37 +7,18 @@ import type { GameCard } from "@/Types/AppTypes"
  * @returns BattleInfo型データ
  */
 export const dataToInfo = (data: CardCaptureResponse) => {
-  const enemyAreaCards = data.enemyArea.deck.map((card: GameCard) => {
-    const gameCard: GameCard = {
-      code: card.code,
-      suit: card.suit,
-      number: card.number,
-      face: card.face,
-      numberCard: card.numberCard,
-      selected: false,
-    }
-    return gameCard
-  })
-  const playerHandCards = data.playerHands.deck.map((card: GameCard) => {
-    const gameCard: GameCard = {
-      code: card.code,
-      suit: card.suit,
-      number: card.number,
-      face: card.face,
-      numberCard: card.numberCard,
-      selected: false,
-    }
-    return gameCard
-  })
+  const enemyAreaCards = deckToGameCards(data.enemyArea)
+  const playerHandCards = deckToGameCards(data.playerHands)
 
   const info = {
     enemyAreaCards,
     playerHandCards,
+
     processState: data.processState,
     battleInfo: {
       rounds: data.rounds,
       enemyDeckSize: data.enemyDeckSize,
-      sealDeckSize: data.sealDeckSize,
+      sealAreaSize: data.sealAreaSize,
       playerDeckSize: data.playerDeckSize,
       discardSize: data.discardSize,
     },
@@ -45,3 +26,58 @@ export const dataToInfo = (data: CardCaptureResponse) => {
 
   return info
 }
+
+/**
+ * 封印アクション結果反映
+ * @param data
+ * @returns
+ */
+export const dataToInfoAct = (data: CardCaptureResponse) => {
+  const enemyAreaCards = deckToGameCards(data.enemyArea)
+  const playerHandCards = deckToGameCards(data.playerHands)
+
+  const info = {
+    processState: data.processState,
+    winMessage: data.gameStateMessage,
+    enemyAreaCards,
+    playerHandCards,
+    sealAreaSize: data.sealAreaSize,
+    discardSize: data.discardSize,
+  }
+
+  return info
+}
+
+/**
+ * ディスカード結果反映
+ * @param data
+ * @returns
+ */
+export const dataToInfoDiscard = (data: CardCaptureResponse) => {
+  const playerHandCards = deckToGameCards(data.playerHands)
+
+  const info = {
+    processState: data.processState,
+    playerHandCards,
+    discardSize: data.discardSize,
+    battleInfo: {
+      rounds: data.rounds,
+    },
+  }
+
+  return info
+}
+
+const deckToGameCards = (deck: GameDeck) =>
+  deck.deck.map((card: GameCard) => {
+    const gameCard: GameCard = {
+      code: card.code,
+      suit: card.suit,
+      number: card.number,
+      isFace: card.isFace,
+      isNumberCard: card.isNumberCard,
+      isJoker: card.isJoker,
+      selected: false,
+    }
+    return gameCard
+  })

@@ -1,7 +1,7 @@
 export type BattleInfo = {
   rounds: number
   enemyDeckSize: number // EnemyDeck枚数
-  sealDeckSize: number // SealCard枚数
+  sealAreaSize: number // SealCard枚数
   playerDeckSize: number // PlayerDeck枚数
   discardSize: number // 捨て場枚数
   // enemyArea: GameCard[] // cardCode(number)の配列
@@ -22,7 +22,8 @@ export type GameCard = {
   code: number
   suit: number
   number: number
-  face: boolean
-  numberCard: boolean
+  isFace: boolean
+  isNumberCard: boolean
+  isJoker: boolean
   selected: boolean
 }

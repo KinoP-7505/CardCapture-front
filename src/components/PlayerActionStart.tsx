@@ -1,4 +1,3 @@
-import { useAxiosStore } from "@/tools/AxiosManager"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import { dataToInfo } from "@/tools/DataSetUtil"
@@ -7,7 +6,6 @@ import { Button } from "@chakra-ui/react"
 import useSWRMutation from "swr/mutation"
 
 export const PlayerActionStart = () => {
-  const axiosStore = useAxiosStore()
   const infoStore = useBattleInfoStore()
 
   // SWRフックを作成
@@ -24,9 +22,7 @@ export const PlayerActionStart = () => {
     infoStore.setBattleInfo(toInfo.battleInfo)
     infoStore.setProcessState(toInfo.processState)
 
-    console.log("battleInfo:", axiosStore.battleInfo)
-
-    axiosStore.addMessage("ゲーム開始：盤面作成")
+    infoStore.addMessage("ゲーム開始：盤面作成")
   }
 
   return (

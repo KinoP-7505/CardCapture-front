@@ -90,10 +90,10 @@ export const CardItem: React.FC<CardItemProps> = ({
         {suit_icon(suit)}
         <Text fontSize="28px">{num}</Text>
       </HStack>
-      <Text mt={1} fontSize="12px" fontWeight="bold">
+      <Text h="20px" mt={0} fontSize="12px" fontWeight="bold">
         {tLabel}
       </Text>
-      <Text mt={1} fontWeight="bold">
+      <Text mt={0} fontWeight="bold">
         {selectText}
       </Text>
     </Box>

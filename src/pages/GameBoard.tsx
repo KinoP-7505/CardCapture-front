@@ -1,6 +1,5 @@
 import { Box, Grid, GridItem } from "@chakra-ui/react"
 import "./GameBoard.css"
-import { useAxiosStore } from "@/tools/AxiosManager"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
 import useSWR from "swr"
 import { EnemyArea } from "@/components/EnemyArea"
@@ -9,13 +8,24 @@ import { PlayerHands } from "@/components/PlayerHands"
 import { PlayerAction } from "@/components/PlayerAction"
 import { MessageInfo } from "@/components/MessageInfo"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
-import type { InitAppResponse } from "@/Types/CardCaptureDto"
+import type { CardCaptureResponse, InitAppResponse } from "@/Types/CardCaptureDto"
+import { DialogConfirm } from "@/components/DialogConfirm"
+import { useState } from "react"
+import useSWRMutation from "swr/mutation"
+import { dataToInfo } from "@/tools/DataSetUtil"
 
 const GameBoard = () => {
   // const axiosStore = useAxiosStore();
   const info = useBattleInfoStore()
   const trumpDeck = info.trumpDeck
-  const addMessage = useAxiosStore((state) => state.addMessage)
+
+  const [isOpen, setIsOpen] = useState(true)
+  const dialogAnser = (ans: string) => {
+    handleStartRound()
+    console.log(`anser: ${ans}`)
+  }
+
+  const [isOpenDefeat, setIsOpenDefeat] = useState(false)
 
   const shouldFetch = trumpDeck.size === 0
 
@@ -24,9 +34,26 @@ const GameBoard = () => {
     onSuccess: (data) => {
       console.log("GET通信成功:", data)
       info.setTrumpDeck(data.trumpDeck)
-      addMessage("トランプカードを受信しました。")
+      info.addMessage("トランプカードを受信しました。")
     },
   })
+
+  // SWRフックを作成
+  const { trigger } = useSWRMutation<CardCaptureResponse>(END_POINT.get_startRound, fetcher)
+
+  const handleStartRound = async () => {
+    const result = await trigger()
+    const toInfo = dataToInfo(result)
+    console.log("handleStartRound")
+    console.log(result)
+
+    info.setEnemyArea(toInfo.enemyAreaCards)
+    info.setPlayerHands(toInfo.playerHandCards)
+    info.setBattleInfo(toInfo.battleInfo)
+    info.setProcessState(toInfo.processState)
+
+    info.addMessage("ゲーム開始：盤面作成")
+  }
 
   return (
     <Box
@@ -77,8 +104,33 @@ const GameBoard = () => {
           <MessageInfo />
         </GridItem>
       </Grid>
+      <DialogConfirm
+        open={isOpen}
+        title="タイトル"
+        onOpenChange={setIsOpen}
+        onAnser={(e) => {
+          dialogAnser(e)
+          setIsOpen(false)
+        }}
+        // confirmText="破棄する"
+        // onConfirm={handleExecute}
+      >
+        ゲーム開始
+      </DialogConfirm>
+      <DialogConfirm
+        open={isOpenDefeat}
+        title="タイトル"
+        onOpenChange={setIsOpenDefeat}
+        onAnser={(e) => {
+          dialogAnser(e)
+          setIsOpen(false)
+        }}
+        // confirmText="破棄する"
+        // onConfirm={handleExecute}
+      >
+        ゲーム敗北
+      </DialogConfirm>
     </Box>
   )
 }
-
 export default GameBoard

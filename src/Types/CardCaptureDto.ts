@@ -9,10 +9,16 @@ export type CardCaptureResponse = {
   playerHands: GameDeck // プレイヤーハンド
   rounds: number // ラウンド数
   enemyDeckSize: number // エネミーデッキサイズ
-  sealDeckSize: number // シールデッキサイズ
+  sealAreaSize: number // シールエリアサイズ
   playerDeckSize: number // プレイヤーデッキサイズ
   discardSize: number // 捨て札デッキサイズ
   processState: number // 処理状態
+
+  isSucces: boolean // 処理結果
+  // ゲーム状態
+  gameState: number
+  // ゲーム状態メッセージ
+  gameStateMessage: string
 }
 
 export type CardCaptureRequest = {

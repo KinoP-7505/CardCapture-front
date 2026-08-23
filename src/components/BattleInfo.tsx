@@ -22,7 +22,7 @@ export const BattleInfo: React.FC = () => {
       <Stack align="flex-start">
         <Text>ラウンド：{rounds}</Text>
         <Text>EnemyDeck枚数：{battleInfo.enemyDeckSize}</Text>
-        <Text>封印カード枚数：{battleInfo.sealDeckSize}</Text>
+        <Text>封印カード枚数：{battleInfo.sealAreaSize}</Text>
         <Text>PlayerDeck枚数：{battleInfo.playerDeckSize}</Text>
         <Text>Discards枚数：{battleInfo.discardSize}</Text>
       </Stack>

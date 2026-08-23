@@ -10,7 +10,15 @@ export const EnemyArea: React.FC = () => {
   const info = useBattleInfoStore()
   const enemyArea = info.enemyArea
   const canSelected = info.cardSelected
-  const act = info.actionState
+
+  // Enemyカード選択処理
+  const handleToggleEnemySelected = (index: number) => {
+    console.log(`handleToggleEnemySelected index = ${index}`)
+    // 選択状態を変更
+    info.toggleCaptureEnemySelected(index)
+    // PlayerHandsを全未選択に設定
+    info.resetSelectedPlayer()
+  }
 
   return (
     <Box h="220px" bg="#C95C0C" p={4}>
@@ -31,9 +39,14 @@ export const EnemyArea: React.FC = () => {
               topLabel={index === 0 ? "TOP CARD" : ""}
               selected={card.selected}
               onClick={() => {
-                if (canSelected && act === 1) {
-                  // 選択中、かつ、捕獲アクションの場合
-                  info.toggleCaptureEnemySelected(index)
+                // 捕獲|吹き飛ばしアクションの場合
+                if (canSelected === 1 || canSelected === 3) {
+                  const nowSelected = info.selectedEnemyCard
+                  // 選択カードが現在選択と異なる場合
+                  if (card.code !== nowSelected) {
+                    handleToggleEnemySelected(index)
+                    // info.toggleCaptureEnemySelected(index)
+                  }
                 }
               }}
             />
