@@ -1,6 +1,7 @@
 import { devtools } from "zustand/middleware"
 import { create } from "zustand"
 import type { BattleInfo, GameCard } from "@/Types/AppTypes"
+import { STATE_ACTION, STATE_PROCESS } from "./constants"
 
 // ゲーム情報State
 type BattleInfoState = {
@@ -17,6 +18,9 @@ type BattleInfoState = {
   setProcessState: (pState: number) => void
   actionState: number // アクション状態
   setActionState: (aState: number) => void
+  gameState: number // ゲーム状態（勝敗等）
+  setGameState: (gState: number) => void
+
   // メッセージ
   message: string
   addMessage: (txt: string) => void
@@ -80,6 +84,9 @@ export const useBattleInfoStore = create<BattleInfoState>()(
 
       actionState: 0, // アクション状態
       setActionState: (aState) => set({ actionState: aState }, false, "setActionState"),
+
+      gameState: 0, // ゲーム状態（勝敗等）
+      setGameState: (gState: number) => set({ gameState: gState }, false, "setGameState"),
 
       winMessage: "",
       setWinMessage: (txt: string) => set({ winMessage: txt }, false, "setWinMessage"),
@@ -189,7 +196,7 @@ export const useBattleInfoStore = create<BattleInfoState>()(
         set(
           (state) => {
             // 1. .map で該当要素の selected だけを反転させた新しい配列を生成する
-            const updatedHands = state.playerHands.map((item, i) => {
+            let updatedHands = state.playerHands.map((item: GameCard, i) => {
               if (i === index) {
                 const nextSelected = !item.selected
                 console.log(
@@ -199,33 +206,72 @@ export const useBattleInfoStore = create<BattleInfoState>()(
                   ...item,
                   selected: nextSelected,
                 }
-              } else if (changeUnSelected && item.isJoker) {
-                // 未選択状態変更、かつ、対象カードがジョーカーの場合、ジョーカーも未選択にする
-                const nextSelected = !item.selected
-                return {
-                  ...item,
-                  selected: nextSelected,
-                }
               }
               // 上記以外は変更なし
               return item
             })
-            // 捕獲アクションの場合
-            if (state.actionState === 1) {
-              // 手札数字合計を行う
-              const sum = updatedHands.reduce((numSum, card) => {
-                if (card.selected) {
-                  return numSum + card.number
+
+            // 捕獲アクション選択中の場合
+            if (
+              state.processState === STATE_PROCESS.ACTION &&
+              state.actionState === STATE_ACTION.CAPTURE
+            ) {
+              // 選択更新の場合、ジョーカー未選択処理
+              if (changeUnSelected) {
+                // 数字カード、かつ、選択の枚数
+                const countNumberCards = updatedHands.filter(
+                  (card) => card.isNumberCard && !card.isJoker && card.selected,
+                ).length
+                console.log("updatedHands countNumberCards", countNumberCards)
+                // 0枚の場合
+                if (countNumberCards === 0) {
+                  // ジョーカーを未選択にしたhandsを作成
+                  updatedHands = updatedHands.map((card) => {
+                    if (card.isJoker) {
+                      return {
+                        ...card,
+                        selected: false,
+                      }
+                    }
+                    // Joker以外はそのまま返す
+                    return card
+                  })
                 }
-                return numSum
-              }, 0)
+              }
+              // 合計値算出
+              let maxNum = 0
+              let countJoker = 0
+              let sum = 0
+              updatedHands.map((card) => {
+                if (card.selected) {
+                  // 選択中の場合
+                  if (card.isNumberCard && card.isJoker) {
+                    // ジョーカーの場合
+                    countJoker++ // ジョーカー枚数カウント
+                  } else {
+                    // 数字の場合
+                    sum = sum + card.number // 合計値
+                    if (maxNum < card.number) {
+                      // 最大数より大きい場合、更新
+                      maxNum = card.number
+                    }
+                  }
+                }
+              })
+              // ジョーカー分合計
+              for (let i = 0; i < countJoker; i++) {
+                sum += maxNum
+              }
+              console.log("updatedHands[] ", updatedHands)
+
+              // 手札状態と合計値を更新
               return {
                 playerHands: updatedHands,
                 sumSelectedHands: sum,
               }
             }
 
-            // 上記委以外の場合
+            // 捕獲ACT以外の場合
             return {
               playerHands: updatedHands,
             }

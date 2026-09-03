@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem } from "@chakra-ui/react"
+import { Box, Grid, GridItem, Image, Stack } from "@chakra-ui/react"
 import "./GameBoard.css"
 import { END_POINT, fetcher } from "@/tools/AxiosUtil"
 import useSWR from "swr"
@@ -9,23 +9,60 @@ import { PlayerAction } from "@/components/PlayerAction"
 import { MessageInfo } from "@/components/MessageInfo"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import type { CardCaptureResponse, InitAppResponse } from "@/Types/CardCaptureDto"
-import { DialogConfirm } from "@/components/DialogConfirm"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import useSWRMutation from "swr/mutation"
 import { dataToInfo } from "@/tools/DataSetUtil"
+import { STATE_PROCESS } from "@/tools/constants"
+import gameStartImg from "../assets/Gemini_Generated_Image_titole.jpg"
+import gameWinImg from "../assets/Gemini_Generated_Image_gameWin.jpg"
+import gameDefeat from "../assets/Gemini_Generated_Image_gameDefeat.jpg"
+import { DialogNotice } from "@/components/DialogNotice"
 
 const GameBoard = () => {
   // const axiosStore = useAxiosStore();
   const info = useBattleInfoStore()
   const trumpDeck = info.trumpDeck
+  // 状態がProcessStateの場合
+  const isProcessState = useBattleInfoStore((state) => state.processState) === STATE_PROCESS.RESULT
+  const gameState = useBattleInfoStore((state) => state.gameState)
 
+  // タイトルダイアログ制御
   const [isOpen, setIsOpen] = useState(true)
   const dialogAnser = (ans: string) => {
-    handleStartRound()
+    handleInitGame()
     console.log(`anser: ${ans}`)
   }
 
-  const [isOpenDefeat, setIsOpenDefeat] = useState(false)
+  // 結果ダイアログボタン制御
+  const dialogFinishAnser = () => {
+    info.setGameState(0)
+    // info.setProcessState(0)
+    setIsOpen(true)
+  }
+  // 結果ダイアログオープン制御
+  const openResultMatch =
+    isProcessState && (gameState === STATE_PROCESS.DEFEAT || gameState === STATE_PROCESS.WIN)
+  // 結果ダイアログ表示制御
+  const valueResultMatch = useMemo(() => {
+    // ゲーム勝利の場合
+    if (isProcessState) {
+      if (gameState === STATE_PROCESS.WIN) {
+        return {
+          text: "全てのカードを捕獲・封印しました。おめでとうございます",
+          img: gameWinImg,
+        }
+      } else if (gameState === STATE_PROCESS.DEFEAT) {
+        return {
+          text: "敗北しました。",
+          img: gameDefeat,
+        }
+      }
+      return {
+        text: "",
+        img: gameWinImg,
+      }
+    }
+  }, [isProcessState, gameState])
 
   const shouldFetch = trumpDeck.size === 0
 
@@ -39,18 +76,22 @@ const GameBoard = () => {
   })
 
   // SWRフックを作成
-  const { trigger } = useSWRMutation<CardCaptureResponse>(END_POINT.get_startRound, fetcher)
+  const initGameSWR = useSWRMutation<CardCaptureResponse>(END_POINT.get_initGame, fetcher)
 
-  const handleStartRound = async () => {
-    const result = await trigger()
+  const handleInitGame = async () => {
+    const result = await initGameSWR.trigger()
     const toInfo = dataToInfo(result)
-    console.log("handleStartRound")
+    console.log("handleInitGame")
     console.log(result)
+
+    // メッセージクリア
+    info.setMessage("")
 
     info.setEnemyArea(toInfo.enemyAreaCards)
     info.setPlayerHands(toInfo.playerHandCards)
     info.setBattleInfo(toInfo.battleInfo)
     info.setProcessState(toInfo.processState)
+    info.setGameState(toInfo.gameState)
 
     info.addMessage("ゲーム開始：盤面作成")
   }
@@ -104,32 +145,51 @@ const GameBoard = () => {
           <MessageInfo />
         </GridItem>
       </Grid>
-      <DialogConfirm
+      <DialogNotice
         open={isOpen}
         title="タイトル"
+        btnText="ゲーム開始"
         onOpenChange={setIsOpen}
         onAnser={(e) => {
           dialogAnser(e)
           setIsOpen(false)
         }}
-        // confirmText="破棄する"
-        // onConfirm={handleExecute}
       >
-        ゲーム開始
-      </DialogConfirm>
-      <DialogConfirm
-        open={isOpenDefeat}
-        title="タイトル"
-        onOpenChange={setIsOpenDefeat}
-        onAnser={(e) => {
-          dialogAnser(e)
-          setIsOpen(false)
+        <Stack align="center">
+          <Image
+            src={gameStartImg}
+            alt="タイトル画面"
+            borderRadius={"md"}
+            maxH={"400px"}
+            objectFit={"cover"}
+          />
+        </Stack>
+      </DialogNotice>
+      <DialogNotice
+        open={openResultMatch}
+        title="結果表示"
+        btnText="タイトル画面"
+        onOpenChange={(open) => {
+          if (!open) dialogFinishAnser()
         }}
-        // confirmText="破棄する"
-        // onConfirm={handleExecute}
+        onAnser={() => {
+          dialogFinishAnser()
+          // setIsOpenDefeat(false)
+          // ゲームタイトルに移動するなど
+        }}
       >
-        ゲーム敗北
-      </DialogConfirm>
+        <Stack align="center">
+          <Image
+            src={valueResultMatch?.img}
+            alt="結果表示"
+            borderRadius={"md"}
+            maxH={"400px"}
+            objectFit={"cover"}
+          />
+        </Stack>
+
+        {valueResultMatch?.text}
+      </DialogNotice>
     </Box>
   )
 }

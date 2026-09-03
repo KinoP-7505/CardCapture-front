@@ -15,6 +15,7 @@ export const dataToInfo = (data: CardCaptureResponse) => {
     playerHandCards,
 
     processState: data.processState,
+    gameState: data.gameState,
     battleInfo: {
       rounds: data.rounds,
       enemyDeckSize: data.enemyDeckSize,
@@ -38,11 +39,13 @@ export const dataToInfoAct = (data: CardCaptureResponse) => {
 
   const info = {
     processState: data.processState,
+    gameState: data.gameState,
     winMessage: data.gameStateMessage,
     enemyAreaCards,
     playerHandCards,
     sealAreaSize: data.sealAreaSize,
     discardSize: data.discardSize,
+    enemyDeckSize: data.enemyDeckSize,
   }
 
   return info

@@ -2,6 +2,7 @@ import { Box, Flex, Text } from "@chakra-ui/react"
 import { CardItem } from "./CardItem"
 import { useBattleInfoStore } from "@/tools/BattleInfoManager"
 import type { GameCard } from "@/Types/AppTypes"
+import { STATE_ACTION, STATE_PROCESS } from "@/tools/constants"
 
 export const EnemyArea: React.FC = () => {
   const cardTiitle = "Enemy\nCard"
@@ -9,7 +10,10 @@ export const EnemyArea: React.FC = () => {
   // const axiossStore = useAxiosStore()
   const info = useBattleInfoStore()
   const enemyArea = info.enemyArea
-  const canSelected = info.cardSelected
+  // アクション（捕獲|吹き飛ばし）の場合、選択可能
+  const canSelected =
+    info.processState === STATE_PROCESS.ACTION &&
+    (info.actionState === STATE_ACTION.CAPTURE || info.actionState === STATE_ACTION.BLOWOUT)
 
   // Enemyカード選択処理
   const handleToggleEnemySelected = (index: number) => {
@@ -40,7 +44,7 @@ export const EnemyArea: React.FC = () => {
               selected={card.selected}
               onClick={() => {
                 // 捕獲|吹き飛ばしアクションの場合
-                if (canSelected === 1 || canSelected === 3) {
+                if (canSelected) {
                   const nowSelected = info.selectedEnemyCard
                   // 選択カードが現在選択と異なる場合
                   if (card.code !== nowSelected) {

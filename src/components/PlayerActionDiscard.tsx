@@ -5,6 +5,9 @@ import type { CardCaptureRequest, CardCaptureResponse } from "@/Types/CardCaptur
 import { Button, Text } from "@chakra-ui/react"
 import useSWRMutation from "swr/mutation"
 
+/**
+ * ディスカード選択コンポーネント
+ */
 export const PlayerActionDiscard = () => {
   const info = useBattleInfoStore()
   const pHands = info.playerHands
@@ -13,7 +16,7 @@ export const PlayerActionDiscard = () => {
   // SWRフックを作成
   // const { trigger, isMutating } = useSWRMutation<
   const { trigger } = useSWRMutation<CardCaptureResponse, Error, string, CardCaptureRequest>(
-    END_POINT.post_executeAction,
+    END_POINT.post_executeDiscard, // ディスカード
     postFetcher,
   )
 

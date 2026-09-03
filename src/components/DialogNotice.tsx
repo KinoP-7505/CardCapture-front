@@ -5,15 +5,20 @@ type PropsDialogConfirm = {
   open: boolean
   title: string
   children: ReactNode
-  // btnText1: string
+  btnText: string
   // btnText2?: string
   onOpenChange: (open: boolean) => void
   onAnser: (anser: string) => void
 }
 
-export const DialogConfirm = ({
+/**
+ * 通知ダイアログ
+ * 操作を止めてユーザに確認を促す目的
+ */
+export const DialogNotice = ({
   open,
   title,
+  btnText,
   children,
   onOpenChange,
   onAnser,
@@ -22,7 +27,7 @@ export const DialogConfirm = ({
     <Dialog.Root open={open} onOpenChange={(e) => onOpenChange(e.open)}>
       <Portal>
         <Dialog.Backdrop />
-        <Dialog.Positioner>
+        <Dialog.Positioner alignItems="flex-start" pt="20">
           <Dialog.Content>
             <Dialog.Header>
               <Dialog.Title>{title}</Dialog.Title>
@@ -31,19 +36,8 @@ export const DialogConfirm = ({
             <Dialog.Body>{children}</Dialog.Body>
 
             <Dialog.Footer>
-              <Button variant="outline" onClick={() => onAnser("1")}>
-                {/* {props.btnText1} */}
-                ゲーム開始
-              </Button>
-              <Button
-                colorPalette="blue"
-                onClick={() => {
-                  onAnser("2")
-                  onOpenChange(false)
-                }}
-              >
-                {/* {btnText2} */}
-                ボタン２
+              <Button variant="surface" width={"100px"} onClick={() => onAnser("1")}>
+                {btnText}
               </Button>
             </Dialog.Footer>
 
